@@ -1,0 +1,100 @@
+generated: '2026-09-19'
+method: probed
+source: >-
+  Live GET probes of the named /.well-known/* path list on agentopt.app and www.agentopt.app, 2026-09-19.
+  Every row below is a request that was actually issued; every status is the one returned. There is no
+  separate API, docs or MCP host — the record knows one host, and www is a TLS-broken alias of it.
+summary:
+  hosts_probed: 2
+  paths_probed: 40
+  documents_served: 1
+  hit_count: 1
+  path_echo_control: passed
+  note: >-
+    agentopt.app serves exactly one well-known document: the A2A agent card, at both the canonical
+    /.well-known/agent-card.json and the legacy /.well-known/agent.json (byte-identical, 8,377 bytes;
+    captured in a2a/). Every other named path returns the application's real JSON 404
+    ({"detail":"Not Found"}, 22 bytes, application/json) — never an HTML shell — and a negative-control
+    path also 404s, so the single hit is a served document. No security.txt, no OAuth/OIDC discovery,
+    no RFC 9728 protected-resource metadata (there is no MCP host to carry it — the operator states the
+    MCP adapter is off), no RFC 9727 API catalog, no APIs.json, no AAuth resource document, no ai-plugin,
+    no UCP/ACP manifest, no llms.txt. www.agentopt.app resolves (CNAME to the same AWS load balancer)
+    but the certificate covers only agentopt.app, so every https://www request fails before HTTP.
+hosts:
+- host: agentopt.app
+  role: Website, API host (POST /v1/select) and agent-card host — one uvicorn origin behind an AWS us-west-2 ALB
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json
+    bytes: 8377
+    file: ../a2a/agentopt-app-agent-card.json
+    standard: A2A Agent Card (protocolVersion "1.0")
+    note: Saved verbatim under a2a/ and graded in a2a/agentopt-app-a2a.yml (conformant, with the no-runtime caveat). Response carries x-robots-tag noindex, nofollow.
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    bytes: 8377
+    file: ../a2a/agentopt-app-agent-card.json
+    note: Legacy pre-0.3 path; byte-identical to the canonical card, so one file holds both.
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    note: No MCP resource server exists to carry RFC 9728 metadata (card mcp_server.enabled false; /ready mcp_enabled false).
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/mcp.json
+    status: 404
+  - path: /.well-known/mcp/server-card.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /llms-full.txt
+    status: 404
+  - path: /.well-known/agentopt-negative-control-7f3a91.json
+    status: 404
+    control: negative
+    note: A path that cannot exist. Its JSON 404 proves the host does not echo or catch-all /.well-known/* requests.
+- host: www.agentopt.app
+  role: Alias — resolves to the same load balancer, but the TLS certificate (CN=agentopt.app) does not cover it
+  documents:
+  - {path: /.well-known/agent-card.json, status: 0, error: 'TLS: no alternative certificate subject name matches www.agentopt.app'}
+  - {path: /.well-known/agent.json, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/security.txt, status: 0, error: TLS handshake failure}
+  - {path: /security.txt, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/openid-configuration, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/oauth-authorization-server, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/oauth-protected-resource, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/api-catalog, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/api-catalog.json, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/ai-plugin.json, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/ucp.json, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/acp.json, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/aauth-resource.json, status: 0, error: TLS handshake failure}
+  - {path: /.well-known/apis.json, status: 0, error: TLS handshake failure}
+  - {path: /apis.json, status: 0, error: TLS handshake failure}
+  - {path: /apis.yml, status: 0, error: TLS handshake failure}
+  - {path: /, status: 0, error: 'TLS handshake failure; plain http://www.agentopt.app/ 301s to https://www.agentopt.app/, which then fails the same way'}

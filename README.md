@@ -1,4 +1,4 @@
-# Vitaly Kantorovich (vitaly.kantorovich.tx@gmail.com)
+# Priorflow
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,5 +64,6 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Vitaly Kantorovich (vitaly.kantorovich.tx@gmail.com) is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
+Priorflow (Priorflow Intelligent Agent/Service Selector) is a hosted, agent-native selection service at agentopt.app, operated by Vitaly Kantorovich, that ranks curated MCP servers and A2A agents for a natural-language task under stated constraints via a single operation, POST https://agentopt.app/v1/select. It is described by an A2A agent card at /.well-known/agent-card.json; the operator states the host is not an MCP server and runs no A2A task runtime, and publishes no OpenAPI. Surfaced via the API Evangelist harvest backlog (source: a2a-registry) and profiled 2026-09-19.
 - https://agentopt.app/
+- https://agentopt.app/.well-known/agent-card.json

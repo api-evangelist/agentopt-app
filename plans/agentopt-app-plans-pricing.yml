@@ -1,0 +1,46 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentopt.app/upgrade
+docs:
+- https://agentopt.app/info
+- https://agentopt.app/.well-known/agent-card.json
+plan_count: 2
+currency: null
+model: open free tier plus prepaid "select packs" (metered selects and/or time-limited keys) bought through Stripe Checkout; no subscription tiers published
+summary: >-
+  Priorflow publishes two tiers and no price. The free tier is an open pilot on this host (the card says
+  "free tier open on this host when enabled" and /ready reports require_api_key false) with limited fields,
+  top_n up to 5 and a per-IP volume envelope. The paid tier is a pf_live_ key that unlocks the rich fields,
+  top_n up to 20, higher RPM and include_explanations; it is sold as a "select pack" — "metered selects
+  and/or time-limited keys (Checkout)" — through self-serve Stripe Checkout at POST /v1/billing/checkout,
+  with the amount set inside Stripe's hosted page and never printed on the site. Keys can also be issued by
+  the operator (a temporary evaluation key "under a short-lived quota" on request), and a shared public
+  evaluation key with a 1,000-call pool and a stated expiry was shown on /try on 2026-09-19.
+plans:
+- id: free
+  name: Free (open deploy)
+  price: 0
+  currency: null
+  period: null
+  auth: none
+  included: 'fields id, score, score_band, name; top_n <= 5; roughly 20/min · 120/hour · 500/day per IP'
+  overage: 'none — 429 with a machine-readable upgrade object'
+  limits: ['non-empty User-Agent required', 'stable caller_agent expected', 'free tier can be closed by the operator (require_api_key)']
+  statement: 'Free — auth: none (limited fields); fields: id, score, score_band, name; top_n <= 5 (/info, Tiers)'
+- id: paid
+  name: Paid (select pack)
+  price: null
+  currency: null
+  period: 'per pack — metered selects and/or a time-limited key'
+  auth: X-API-Key (pf_live_) or Authorization Bearer
+  included: 'fields id, score, score_band, name, source_url, endpoint, connect, homepage_url, endpoint_status, tags, dimensions, recommendation, clarifications, score_breakdown; top_n <= 20; higher RPM; include_explanations'
+  overage: '402 select_quota_exceeded when the pack is used up; 402 api_key_expired when a time-limited key lapses'
+  purchase: 'Stripe Checkout — POST https://agentopt.app/v1/billing/checkout {customer_email?, client_reference_id?} -> checkout_url; after payment GET /v1/billing/session/{session_id}/key reveals the key once'
+  price_note: >-
+    No amount, pack size or key lifetime is published on /upgrade, /info or in the card; the price exists
+    only inside the Stripe Checkout session. Recorded as null rather than guessed.
+  statement: 'Paid — auth: X-API-Key; ... top_n <= 20 (/info, Tiers); self-serve packs: metered selects and/or time-limited keys (Checkout) (/upgrade)'
+probed:
+- {url: 'https://agentopt.app/upgrade', status: 200, fetched: '2026-09-19'}
+- {url: 'https://agentopt.app/pricing', status: 404}
+- {url: 'https://agentopt.app/terms', status: 404, note: 'no terms of service exist to state refund or pack terms'}

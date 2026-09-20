@@ -1,0 +1,61 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentopt.app/status
+docs:
+- https://agentopt.app/info
+- https://agentopt.app/.well-known/agent-card.json
+versioning:
+  scheme: uri-path
+  current: v1
+  product_version: 0.2.0
+  evidence: 'agent card version "0.2.0"; /info header "https://agentopt.app · v0.2.0"; the only API path is /v1/select'
+  policy_published: false
+  note: >-
+    A v1 path prefix and a 0.2.0 product version, with no statement of how either will change. The site
+    calls itself a "Hosted selector pilot" in every page footer and an "MVP" in the card ("Primary
+    interaction: custom JSON skill only (MVP)").
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  note: No deprecation or versioning policy page exists (/changelog 404, /docs 404). No Deprecation pointer is emitted.
+status_page:
+  url: https://agentopt.app/status
+  status: 200
+  fetched: '2026-09-19'
+  machine_json: https://agentopt.app/v1/status
+  machine_json_note: Linked from the page as "Machine JSON"; not fetched because robots.txt disallows /v1/.
+  kind: provider-authored health snapshot, updated from automated Observer scorecards (typically daily) and a daily synthetic probe of production select
+  observed:
+    health: healthy
+    as_of: '2026-09-19T22:13:19'
+    trend: stable
+    catalog: {active_45d: 5000, total: 7864, skills_breadth: 12112, skills_stable: 909, skills_assignments: 56131, hapax_share: '84%', reconfirmed_14d: '74%'}
+    select_probe: {success_rate: '100.0%', relevance_pass_rate: '95.0%', paid_richness: '5.0 / 5'}
+    latency_band: {free: 'about 1300–3000 ms', paid: 'about 1100–1500 ms', note: 'Confirmed range from the last automated health check — not a multi-day latency chart. (verbatim)'}
+    quality: {typical_maturity: '0.80 / 1', typical_reliability: '0.79 / 1', typical_first_pick_match: '0.73 / 1'}
+    trend_table_rows: 7
+    trend_window: '2026-09-15 to 2026-09-19'
+  note: >-
+    A real, dated, provider-authored status surface with a seven-row history table, so a StatusPage pointer
+    is emitted. It is a catalog-and-probe scorecard rather than an incident feed: the page says its figures
+    are "not organic customer traffic" and "not system traffic/probe gates", and there is no incident history,
+    uptime percentage or subscription. Live liveness is separately available at /health and /ready (JSON).
+sla:
+  published: false
+  note: No uptime target, support SLA or terms of service anywhere on the site.
+changelog:
+  published: false
+  probed: [{url: 'https://agentopt.app/changelog', status: 404}]
+  dated_signals:
+  - {date: '2026-09-19', what: 'Observer scorecard as_of 2026-09-19T22:13:19 (status page)'}
+  - {date: '2026-09-15', what: 'earliest row in the status page catalog-trend table'}
+  - {date: '2026-09-29', what: 'stated expiry of the shared evaluation key shown on /try'}
+  - {date: '2027-01-28', what: 'TLS certificate expiry for agentopt.app (security/agentopt-app-domain-security.yml)'}
+  note: No changelog artifact is written; the dated signals above are the only change history the provider publishes.
+explicit_negatives:
+  - 'not_an_mcp_server: true; mcp_server.enabled false (card) — mcp_enabled false (/ready)'
+  - 'not_full_a2a_runtime: true; a2a_runtime.enabled false (card) — a2a_runtime_enabled false (/ready)'
+  - 'not_remote_candidate_proxy: true (card)'

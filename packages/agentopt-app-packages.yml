@@ -1,0 +1,17 @@
+generated: '2026-09-19'
+method: searched
+source: registry searches 2026-09-19
+package_count: 0
+packages: []
+searched:
+- {registry: npm, query: 'https://registry.npmjs.org/-/v1/search?text=priorflow&size=5', result: 0 packages}
+- {registry: npm, query: 'https://registry.npmjs.org/priorflow', status: 404}
+- {registry: pypi, query: 'https://pypi.org/pypi/priorflow/json', status: 404}
+- {registry: pypi, query: 'https://pypi.org/pypi/agentopt/json', status: 404}
+- {registry: github, query: 'https://api.github.com/search/repositories?q=priorflow+agentopt', result: 0 repositories}
+- {registry: github, query: 'https://api.github.com/search/repositories?q=agentopt.app', result: 0 repositories}
+note: >-
+  Priorflow publishes no client library, CLI or SDK in any registry searched, and neither the site nor the
+  agent card references one — the documented way in is a raw curl to POST /v1/select (/info, "Integrate
+  (copy-paste)"). The /upgrade page mentions an operator-side script (create_api_key.py) that is not
+  distributed. No Packages or SDKs pointer is emitted.

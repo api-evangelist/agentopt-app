@@ -1,0 +1,66 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentopt.app/upgrade
+probed: true
+docs:
+- https://agentopt.app/info
+- https://agentopt.app/.well-known/agent-card.json
+format: json-error-object
+envelope:
+  media_type: application/json
+  fields:
+  - name: detail
+    description: FastAPI's default error body on unknown routes — observed {"detail":"Not Found"} on every 404 in this pass.
+  - name: upgrade
+    description: >-
+      A machine-readable object the provider says accompanies 402 and free-tier 429 responses so an agent can
+      act without HTML — "responses include JSON upgrade (no HTML required)" (/upgrade); "429 responses may
+      include machine-readable upgrade object" (card). Its exact schema is not published; the card's own
+      priorflow.upgrade block (url, benefits, obtain {mode, method, path, url, reveal_path_template, header})
+      is the closest published description.
+  observed:
+  - {status: 404, body: '{"detail":"Not Found"}', url: 'https://agentopt.app/openapi.json', note: 'The generic 404 for every unknown path — 22 bytes, application/json, never an HTML shell.'}
+  note: >-
+    Not RFC 9457 — no type URI, title, status or instance fields. The 401/402/429 bodies were NOT observed:
+    robots.txt disallows /v1/ and exercising them would mean calling the production select or billing routes,
+    so the codes below are recorded from the provider's published statements only.
+problem_types:
+- status: 401
+  title: Invalid API key
+  code: null
+  source_operations: ['POST /v1/select']
+  statement: 'Invalid keys always return 401. (/upgrade); Invalid keys are rejected. (card securitySchemes.apiKey)'
+  remediation: Send a valid pf_live_ key as X-API-Key or Authorization Bearer, or omit the key entirely to fall back to the free tier while it is open.
+- status: 402
+  title: Paid feature requested without a key
+  code: upgrade_required
+  source_operations: ['POST /v1/select (include_explanations, top_n > 5, rich fields)']
+  statement: 'Paid-only features without a key may return 402 upgrade_required. (/upgrade); on_paid_feature_without_key: "402 upgrade_required when enabled" (card)'
+  remediation: Follow the upgrade object — obtain a key via POST /v1/billing/checkout + one-time reveal, or drop the paid parameters.
+- status: 402
+  title: Select pack exhausted
+  code: select_quota_exceeded
+  source_operations: ['POST /v1/select (paid)']
+  statement: 'Exhausted packs return 402 select_quota_exceeded (/upgrade)'
+  remediation: Buy another pack (Stripe Checkout at /upgrade) or continue on the free tier.
+- status: 402
+  title: API key expired
+  code: api_key_expired
+  source_operations: ['POST /v1/select (paid)']
+  statement: 'Exhausted packs return 402 select_quota_exceeded or api_key_expired. (/upgrade)'
+  remediation: Time-limited keys expire; obtain a new pack. The /try evaluation key, for example, carries a stated expiry.
+- status: 429
+  title: Free-tier rate limit exceeded
+  code: null
+  source_operations: ['POST /v1/select (free)']
+  statement: 'On free-tier rate limits, responses include JSON upgrade (no HTML required). (/upgrade); Free open pilot volume is roughly 20/min · 120/hour · 500/day per IP. (/info)'
+  headers: undocumented (no Retry-After or RateLimit-* header is mentioned anywhere)
+  remediation: Back off to the published per-IP envelope, or upgrade for "higher RPM"; the upgrade object in the body names the path.
+- status: 404
+  title: Not Found
+  code: null
+  observed: true
+  note: Any unknown path, including the disabled FastAPI auto-docs (/docs, /redoc, /openapi.json).
+status_endpoints:
+  - {url: 'https://agentopt.app/health', observed: '{"status":"ok","service":"priorflow-servant","environment":"production"}'}
+  - {url: 'https://agentopt.app/ready', observed: '{"status":"ok","database":true,"candidates_active":5000,"candidates_total":7864,"embedding_provider":"bedrock","environment":"production","require_api_key":false,"publish_agent_card":true,"mcp_enabled":false,"a2a_runtime_enabled":false}'}

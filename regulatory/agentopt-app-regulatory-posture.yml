@@ -1,0 +1,50 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://agentopt.app/
+signals: {}
+summary: >-
+  Priorflow publishes none of the fourteen horizontal regulatory signals. The site has no legal pages at
+  all — /terms, /privacy, /legal, /security, /contact and /about all return the application's JSON 404 —
+  so there is no privacy policy to carry a data-subject-request process, a subprocessor list, a GPC
+  statement or an incident SLA, and no accessibility, transparency, SBOM or data-residency page. The
+  only disclosure-shaped statements are operational: the card says the ranking engine's "Algorithms,
+  models, and infrastructure details are confidential commercial IP", the /info page says there is "no
+  LLM on the select path", and /ready names the embedding provider (bedrock). None of those is a regime
+  signal and none is recorded as one. An empty signals map is the measurement.
+probed_absent:
+- signal: sbom
+  urls: [{url: 'https://agentopt.app/security/sbom', status: 404}, {url: 'https://agentopt.app/security', status: 404}]
+  note: Never derived — search only.
+- signal: support_lifetime
+  urls: [{url: 'https://agentopt.app/changelog', status: 404}]
+  note: 'No versioning page; the product self-describes as a "pilot" and an "MVP" with no stated support period.'
+- signal: accessibility_conformance
+  urls: [{url: 'https://agentopt.app/accessibility', status: 404}, {url: 'https://agentopt.app/accessibility/vpat', status: 404}]
+- signal: training_data_summary
+  urls: [{url: 'https://agentopt.app/ai/transparency', status: 404}]
+  note: 'The card states the engine is proprietary and confidential; /ready discloses embedding_provider "bedrock". No training-data summary.'
+- signal: ai_transparency
+  urls: [{url: 'https://agentopt.app/ai/transparency', status: 404}]
+  note: '"Hybrid matching over a curated catalog — no LLM on the select path" (/info) is a product statement, not an AI-interaction or AI-content disclosure under any regime; not recorded.'
+- signal: global_privacy_control
+  urls: [{url: 'https://agentopt.app/privacy', status: 404}]
+  note: No privacy policy exists to make the statement. Not tested by sending a header.
+- signal: data_subject_request
+  urls: [{url: 'https://agentopt.app/privacy', status: 404}, {url: 'https://agentopt.app/privacy/requests', status: 404}]
+- signal: subprocessors
+  urls: [{url: 'https://agentopt.app/legal/subprocessors', status: 404}, {url: 'https://agentopt.app/legal', status: 404}]
+  note: 'The only third parties visible are infrastructural — AWS us-west-2 (ALB hostname in DNS), Bedrock (/ready), Stripe (Checkout on /upgrade), Porkbun (nameservers) — observed, not disclosed by the provider.'
+- signal: data_residency
+  urls: [{url: 'https://agentopt.app/docs/data-residency', status: 404}]
+  note: 'Hosting location is inferable from DNS (us-west-2) but no residency statement or choice is published.'
+- signal: incident_notification
+  urls: [{url: 'https://agentopt.app/legal/dpa', status: 404}]
+- signal: age_assurance
+  note: Not documented; the service is sold to software agents and their sponsors.
+- signal: notice_and_action
+  urls: [{url: 'https://agentopt.app/legal/report-content', status: 404}]
+- signal: transparency_report
+  urls: [{url: 'https://agentopt.app/transparency', status: 404}]
+- signal: exit_assistance
+  note: No export or portability documentation; the product holds no customer data beyond a key and a metered balance.

@@ -1,0 +1,55 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentopt.app/try
+docs:
+- https://agentopt.app/info
+- https://agentopt.app/upgrade
+probed:
+- {url: 'https://agentopt.app/try', status: 200, fetched: '2026-09-19'}
+- {url: 'https://agentopt.app/ready', status: 200, fetched: '2026-09-19', note: 'require_api_key false — the free tier is open'}
+summary: >-
+  There is no separate test environment, no test-mode key prefix and no dry-run flag: production is the
+  sandbox. The rehearsal surface is (1) the open free tier — the same POST /v1/select with fewer fields and
+  top_n <= 5, callable with no credential — and (2) /try, a server-rendered browser form that POSTs
+  same-origin to the production /v1/select with preset query chips (Web scrape, GitHub, SQL analytics,
+  Slack), top_n, caller_agent, an optional API key field and an include_explanations toggle, showing ranked
+  candidates and the raw JSON. The page states the key "is sent only as a request header and is not stored
+  by this page" and that "Agents should call the API directly; this page is for human exploration."
+playground:
+  url: https://agentopt.app/try
+  kind: hosted browser form (console) over the production endpoint
+  inputs: [query (required), task description (optional), top_n (free cap 5 · paid cap 20), caller_agent, API key (optional), include_explanations (paid)]
+  outputs: [ranked candidates with score bands, raw JSON]
+test_vs_live:
+  separate_environment: false
+  key_prefixes:
+    live: pf_live_
+    test: none published
+  note: One host, one key type. The free tier is the only "test mode", and it is production.
+free_tier_as_rehearsal:
+  endpoint: POST https://agentopt.app/v1/select
+  credential: none (non-empty User-Agent required)
+  returns: [id, score, score_band, name]
+  caps: 'top_n <= 5; roughly 20/min · 120/hour · 500/day per IP'
+  example_request_verbatim: |
+    curl -sS https://agentopt.app/v1/select \
+      -H 'Content-Type: application/json' \
+      -H 'User-Agent: my-orchestrator/1.0' \
+      -d '{"query":"Find a reliable MCP server for structured web scraping of product pages","top_n":5,"caller_agent":"my-orchestrator-v1"}'
+  example_source: https://agentopt.app/info#integrate
+operator_published_evaluation_key:
+  present: true
+  observed: '2026-09-19'
+  label: 'Evaluation paid key (operator-published) — Active — Shared public evaluation pool · remaining 825 / 1000 · expires 2026-09-29T16:26:41.836142+00:00 · not for production agent fleets · rate limits apply'
+  value_recorded: false
+  why_not_recorded: >-
+    The /try page prints a live pf_live_ paid key drawn from a shared, expiring 1,000-call pool. It is a
+    real production credential, not a test-mode value, so it is deliberately omitted from this repository:
+    copying it would place a live key into a public source history, and it will be exhausted or expired
+    within days. An agent that wants it should read /try directly.
+  how_to_get_a_longer_one: 'For collaboration or deeper evaluation, contact the Priorflow operator to request a temporary paid API key under a short-lived quota. (verbatim, /try)'
+test_values:
+  magic_values: none
+  fixtures: 'four preset query chips on /try (Web scrape, GitHub, SQL analytics, Slack) and ten example queries in the card''s select-agents skill'
+  time_simulation: none
+  note: Never invent test values; nothing beyond the above is published.

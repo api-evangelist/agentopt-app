@@ -1,0 +1,113 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentopt.app/.well-known/agent-card.json
+docs:
+- https://agentopt.app/info
+- https://agentopt.app/upgrade
+- https://agentopt.app/status
+base_url: https://agentopt.app/v1
+media_type: application/json
+surface:
+  note: >-
+    The API is one operation: POST /v1/select, a query that ranks catalog candidates for a task. Support
+    reads: GET /ready and GET /health (JSON, unauthenticated), GET /v1/status (machine JSON behind the
+    /status page), GET /v1/catalog/summary (catalog size, dimensions and score scales). Billing writes:
+    POST /v1/billing/checkout and GET /v1/billing/session/{session_id}/key. robots.txt disallows /v1/ to
+    all user agents, so none of the /v1/ routes were exercised in this pass beyond one early fetch of
+    /v1/catalog/summary; everything below is from the card and the pages.
+auth:
+  style: >-
+    Anonymous free tier (non-empty User-Agent required; stable caller_agent recommended) or a paid key sent
+    as X-API-Key or Authorization: Bearer. Keys are issued once to a human sponsor and used autonomously by
+    agents thereafter.
+  detail: authentication/agentopt-app-authentication.yml
+request_shape:
+  select:
+    method: POST
+    path: /v1/select
+    body: '{query, top_n?, constraints?, weights?, caller_agent?} (card); include_explanations? is a paid-only flag (/info, /try)'
+    query: natural-language task or capability need (required)
+    top_n: 'free cap 5, paid cap 20 (card tiers.top_n_max)'
+    constraints: optional — modalities, integration types, industries (card skill description)
+    weights: optional — over reliability, cost, latency, autonomy, maturity
+    caller_agent: 'a stable identifier for the calling agent — "always send ... a stable caller_agent" (/info)'
+    headers_required: ['Content-Type: application/json', 'User-Agent: <non-empty> (free tier)', 'X-API-Key or Authorization: Bearer (paid tier)']
+response_shape:
+  select:
+    free_fields: [id, score, score_band, name]
+    paid_fields: [id, score, score_band, name, source_url, endpoint, connect, homepage_url, endpoint_status, tags, dimensions, recommendation, clarifications, score_breakdown]
+    ordering: ordered candidates, best first
+    score_semantics: 'Absolute hybrid fit on a 0-1 scale (higher is better); 0.55 usable, 0.72+ strong; bands weak <0.55 / usable 0.55-0.72 / strong >=0.72. Not a relative rank among the current list. (card matching.score_scale)'
+    dimension_semantics: '0-1, higher always better; cost higher = cheaper; latency higher = faster; bands low <0.35 / mid 0.35-0.55 / high 0.55-0.75 / very_high >=0.75. (card matching.dimension_scale)'
+    endpoint_status: 'live | stale | unknown, from a 14-day listing reconfirm (card)'
+idempotency:
+  supported: false
+  coverage: na
+  mechanism: null
+  header: null
+  scope: []
+  retention: undocumented
+  description: >-
+    POST /v1/select is a read — a ranking query with no server-side side effect other than metering — so
+    idempotency is not applicable to the product surface: repeating it costs another metered select on a
+    paid pack but changes no state. The only mutating operation is POST /v1/billing/checkout, which opens
+    a Stripe Checkout session; no idempotency key is documented for it, and a duplicate call opens a second
+    session rather than charging twice (payment happens in Stripe's hosted flow). Recorded as na for the
+    API and none for the billing write, with no Idempotency pointer emitted.
+  gaps:
+  - No idempotency key on POST /v1/billing/checkout; no guidance on retrying it.
+  - No statement on whether a timed-out select was metered against a paid pack.
+dry_run_mode:
+  supported: false
+  status: none
+  note: >-
+    No dry-run flag or sandbox route. The nearest rehearsal is the free tier itself (same endpoint, fewer
+    fields, top_n <= 5) and the /try browser form, which POSTs to the same production /v1/select. See sandbox/.
+reversibility:
+  grade: na
+  docs: https://agentopt.app/upgrade
+  note: >-
+    The API surface is read-only (select) so reversibility is not applicable to it. The one write — buying a
+    select pack through Stripe Checkout — has no documented cancel, refund or expiry-extension path anywhere on
+    the site, and there are no terms of service (/terms, /legal, /privacy all 404) that could state one. No
+    window is asserted because none is published.
+  write_surfaces:
+  - operation: POST /v1/billing/checkout
+    action: Open a Stripe Checkout session for one select pack (metered selects and/or a time-limited key)
+    reversal: none documented
+    reversal_operation: null
+    window: null
+    grade: none
+    note: 'Exhausted packs return 402 select_quota_exceeded; expired keys return 402 api_key_expired (/upgrade). No refund or cancellation statement exists.'
+pagination:
+  style: none
+  note: 'A select returns at most top_n candidates (5 free / 20 paid); there is no cursor, offset or next page.'
+field_expansion:
+  style: tier-gated
+  note: 'Field richness is a function of the tier, not of a request parameter: the paid key unlocks the 10 extra fields; include_explanations (paid) adds recommendation/clarification prompts.'
+request_tracing:
+  header: null
+  note: 'No request-id header is documented. The body-level caller_agent is the only correlation identifier the provider asks for.'
+versioning:
+  scheme: uri-path
+  current: v1
+  product_version: 0.2.0 (agent card version; /info header "v0.2.0")
+  detail: lifecycle/agentopt-app-lifecycle.yml
+error_envelope:
+  media_type: application/json
+  shape: >-
+    Unknown paths return {"detail":"Not Found"} (FastAPI default; observed). Tier and quota failures carry a
+    machine-readable upgrade object in the JSON body — "Handle 402 / 429 via machine-readable upgrade in the
+    body" (/info) — with named codes upgrade_required, select_quota_exceeded and api_key_expired on 402.
+    Not RFC 9457.
+  detail: errors/agentopt-app-problem-types.yml
+rate_limit_signaling:
+  status_on_exhaustion: 429
+  body: 'JSON upgrade object — "429 responses may include machine-readable upgrade object" (card priorflow.upgrade.on_rate_limit)'
+  headers: undocumented
+  detail: rate-limits/agentopt-app-rate-limits.yml
+statements_of_scope:
+  - 'Does not invoke or proxy the selected remote MCP/A2A tools for you. (card)'
+  - 'This host is NOT an MCP server (MCP adapter off). (card)'
+  - 'Does NOT run full A2A task delegation (no streaming; select-task runtime off). (card)'
+  - 'Hybrid matching over a curated catalog — no LLM on the select path. (/info)'

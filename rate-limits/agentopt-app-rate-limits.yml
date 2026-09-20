@@ -1,0 +1,49 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentopt.app/info
+docs:
+- https://agentopt.app/upgrade
+- https://agentopt.app/.well-known/agent-card.json
+limit_count: 3
+summary: >-
+  The free tier's volume is published on the /info page as an approximate per-IP envelope across three
+  windows; the paid tier is described only as "higher RPM" with no number. Exhaustion is a 429 whose JSON
+  body may carry a machine-readable upgrade object; no rate-limit response header (RateLimit-*,
+  X-RateLimit-*, Retry-After) is documented anywhere, and none was observed because robots.txt disallows
+  /v1/ and the select route was not called.
+limits:
+- scope: per-IP
+  tier: free
+  window: 1 minute
+  limit: 20
+  burst: null
+  statement: 'Free open pilot volume is roughly 20/min · 120/hour · 500/day per IP. (/info, Integrate)'
+  approximate: true
+- scope: per-IP
+  tier: free
+  window: 1 hour
+  limit: 120
+  burst: null
+  approximate: true
+- scope: per-IP
+  tier: free
+  window: 1 day
+  limit: 500
+  burst: null
+  approximate: true
+- scope: per-key
+  tier: paid
+  window: null
+  limit: null
+  statement: 'higher top_n and RPM (card priorflow.upgrade.benefits); Paid: top_n <= 20, higher RPM. (/upgrade)'
+  note: No number is published for the paid tier; recorded as an unquantified statement, not counted in limit_count.
+result_caps:
+  - {tier: free, top_n_max: 5}
+  - {tier: paid, top_n_max: 20}
+response:
+  status_on_exhaustion: 429
+  body: 'JSON — "On free-tier rate limits, responses include JSON upgrade (no HTML required)." (/upgrade); "429 responses may include machine-readable upgrade object" (card)'
+  headers: []
+  headers_note: Undocumented. An agent must read the body; there is no published Retry-After.
+related:
+  quota_exhaustion_paid: '402 select_quota_exceeded (pack used up) / 402 api_key_expired (time-limited key) — see errors/agentopt-app-problem-types.yml'

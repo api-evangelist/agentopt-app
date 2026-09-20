@@ -1,0 +1,175 @@
+generated: '2026-09-19'
+method: probed
+source: https://agentopt.app/.well-known/agent-card.json
+card:
+  file: a2a/agentopt-app-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: agentopt.app
+  note: >-
+    Served from the apex host, which is also the only API host (POST https://agentopt.app/v1/select) —
+    one uvicorn origin behind an AWS us-west-2 application load balancer (priorflow-servant-alb). The
+    legacy /.well-known/agent.json returns a byte-identical copy of the same document (8,377 bytes), so
+    the card is reachable at both paths. www.agentopt.app resolves to the same load balancer but the
+    certificate covers only CN=agentopt.app, so every https://www request fails the TLS handshake. Every
+    other /.well-known/* path returns the application's real JSON 404 ({"detail":"Not Found"}, 22 bytes)
+    and a negative-control path that cannot exist also 404s, so the 200 on the card is a served
+    document, not a catch-all. The card response carries x-robots-tag: noindex, nofollow. Ownership is
+    not in question: the card's url is https://agentopt.app, its provider.organization is the same
+    string the site's own /info page prints under "Provider:", and the site title is the card's name.
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://agentopt.app/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  body_bytes: 8377
+  sha256: 2246cd5e41f45759bd69aedc37c92e75d553173c966fb65dc8370ea70ab9da4a
+  body_parses_as: JSON object with AgentCard shape (protocolVersion, name, description, url, provider, version, capabilities, securitySchemes, security, defaultInputModes, defaultOutputModes, skills) plus a legacy authentication block and a vendor priorflow block
+  corroborating_probes:
+  - url: https://agentopt.app/.well-known/agent.json
+    http_status: 200
+    note: Legacy pre-0.3 path; byte-identical to the canonical card.
+  - url: https://agentopt.app/.well-known/agentopt-negative-control-7f3a91.json
+    http_status: 404
+    note: Negative control — a path that cannot exist. Its JSON 404 proves the host does not catch-all /.well-known/*.
+  - url: https://www.agentopt.app/.well-known/agent-card.json
+    http_status: 0
+    note: TLS handshake failure — certificate subjectAltName does not cover www.agentopt.app.
+  - url: https://agentopt.app/ready
+    http_status: 200
+    response: '{"status":"ok","database":true,"candidates_active":5000,"candidates_total":7864,"embedding_provider":"bedrock","environment":"production","require_api_key":false,"publish_agent_card":true,"mcp_enabled":false,"a2a_runtime_enabled":false}'
+    note: The readiness endpoint confirms from the server side what the card says — the agent card is published, the MCP adapter is off and the A2A task runtime is off.
+  - url: https://agentopt.app/robots.txt
+    http_status: 200
+    note: >-
+      Disallows /v1/, /mcp and /a2a to all user agents. Honored: no request was made to /v1/select, to /mcp
+      or to /a2a, so the select skill was NOT exercised and no A2A JSON-RPC method was attempted. The card
+      itself states there is nothing to attempt (a2a_runtime.enabled false, endpoint null).
+  - url: https://a2aregistry.org
+    note: The card was first seen as one of 415 agents listed on a2aregistry.org (fetched 2026-09-19, author "Vitaly Kantorovich (vitaly.kantorovich.tx@gmail.com)"), which is how this provider entered the harvest backlog. The registry listing was the lead; the card above was fetched directly from the provider's host.
+agent_card:
+  name: Priorflow Intelligent Agent/Service Selector
+  description: >-
+    An agent-native service that discovers, ranks and recommends MCP servers and A2A agents for a task under
+    constraints (cost, latency, reliability, specialization, autonomy, maturity), using hybrid structured +
+    semantic matching over a curated multi-source catalog. It does not invoke the selected tools, is not an
+    MCP server, and does not run A2A task delegation — the primary skill is a custom JSON call to POST /v1/select.
+  url: https://agentopt.app
+  version: 0.2.0
+  protocol_version: '1.0'
+  preferred_transport: null
+  provider:
+    organization: Vitaly Kantorovich (vitaly.kantorovich.tx@gmail.com)
+    url: null
+  capabilities:
+    streaming: false
+    push_notifications: false
+    state_transition_history: false
+    extended_agent_card: false
+  default_input_modes: [application/json, text/plain]
+  default_output_modes: [application/json]
+  security_schemes:
+    apiKey: {type: apiKey, in: header, name: X-API-Key, description: 'Paid-tier API key. Free tier works without a key (limited fields). Invalid keys are rejected.'}
+  security: []
+  legacy_authentication_block: {schemes: [Bearer, ApiKey], credentials: null, required: false}
+  documentation_url: null
+  icon_url: null
+  skill_count: 2
+  skills:
+  - {id: select-agents, name: Select Agents, tags: 22, examples: 10, input_modes: [application/json], output_modes: [application/json], invocation: 'POST /v1/select with JSON body {query, top_n?, constraints?, weights?, caller_agent?}'}
+  - {id: describe-catalog, name: Describe Catalog, tags: 8, examples: 4, input_modes: [text/plain, application/json], output_modes: [application/json, text/plain], invocation: 'Descriptive; the card says live size is also available via GET /ready'}
+  vendor_block:
+    key: priorflow
+    summary: >-
+      A top-level, non-standard object that is in effect the machine-readable contract for the product:
+      api.select {method POST, path /v1/select, url, require_api_key false, tiers.free {returns id/score/
+      score_band/name, top_n_max 5}, tiers.paid {auth X-API-Key, 14 returned fields, top_n_max 20}};
+      matching {type hybrid, five structured dimensions, score_scale 0-1 with usable_at 0.55 / strong_at
+      0.72, dimension_scale bands}; explicit negatives (not_an_mcp_server, not_full_a2a_runtime,
+      not_remote_candidate_proxy; mcp_server.enabled false; a2a_runtime.enabled false); interaction
+      "POST /v1/select JSON skill"; info/try/upgrade page links; and an upgrade block (HTTP 402 on paid
+      features, 429 may carry a machine-readable upgrade object, Stripe Checkout at POST /v1/billing/
+      checkout with a one-time key reveal at GET /v1/billing/session/{session_id}/key).
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: '1.0'
+  preferred_transport: null
+  hard_checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+  optional_fields:
+    default_input_modes: true
+    default_output_modes: true
+    preferred_transport: false
+  grade_basis: >-
+    Graded against the A2A 1.0.0 hard checks. capabilities is an OBJECT (pass) with streaming,
+    pushNotifications, stateTransitionHistory and extendedAgentCard all false. protocolVersion is present at
+    the top level (pass), declared as "1.0". skills is an ARRAY (pass) of two fully-populated skills, each
+    with id, name, description, tags, examples, inputModes and outputModes. defaultInputModes and
+    defaultOutputModes are present; preferredTransport is absent and no supportedInterfaces[] or
+    additionalInterfaces[] block replaces it. Every hard check passes, so the mechanical grade is
+    conformant — with the substantive caveat recorded in the first deviation: the card itself says no A2A
+    protocol runtime stands behind it.
+  deviations:
+  - field: a2a_runtime / interaction (vendor block) and url
+    observed: >-
+      priorflow.a2a_runtime = {enabled: false, endpoint: null, methods: [], streaming: false}; priorflow.interaction
+      = "POST /v1/select JSON skill"; not_full_a2a_runtime = true; url = https://agentopt.app (the site root, not a
+      JSON-RPC endpoint); /ready reports a2a_runtime_enabled false.
+    note: >-
+      The card is structurally an A2A agent card but, by the operator's own declaration, no A2A method
+      (message/send, tasks/get, streaming) is served. It functions as a discovery document for a REST call.
+      An A2A client that reads the card and POSTs JSON-RPC to url will not reach an A2A agent; it must instead
+      follow the prose and the priorflow.api block to POST /v1/select. This is the material finding — recorded
+      as a deviation rather than a hard failure because the 1.0.0 hard checks do not test for a live runtime,
+      and because robots.txt disallows /a2a and /v1/ so no live check was made.
+  - field: protocolVersion
+    observed: '"1.0"'
+    note: >-
+      Present (pass), but not spelled as a released A2A protocol version identifier ("0.2.x", "0.3.0",
+      "1.0.0"). A reader comparing exact strings will not match it to any release.
+  - field: preferredTransport / supportedInterfaces / additionalInterfaces
+    observed: all absent
+    note: >-
+      No transport is declared. Under 0.3.0 the default would be JSONRPC at url, which the vendor block
+      says is not served; under 1.0.0 a supportedInterfaces[] entry would be required. Consistent with a
+      card that advertises no protocol runtime.
+  - field: provider.url
+    observed: absent (provider = {organization} only)
+    note: AgentProvider requires both organization and url. The organization string is a personal name plus a Gmail address rather than an organization name.
+  - field: securitySchemes / security / authentication
+    observed: >-
+      securitySchemes declares apiKey (X-API-Key); security is an empty array; a legacy 0.2-style
+      authentication block ({schemes: [Bearer, ApiKey], credentials: null, required: false}) sits beside it.
+    note: >-
+      Both card generations' auth shapes coexist. The empty security[] correctly signals that anonymous
+      calls are accepted (the free tier), and the /upgrade page confirms Authorization: Bearer is accepted
+      as an alternative to X-API-Key, so the legacy block is accurate — but it is not part of the 0.3+/1.0
+      schema and a strict validator would flag it as an unknown property.
+  - field: priorflow (top-level)
+    observed: a large vendor object at the top level rather than under capabilities.extensions[]
+    note: >-
+      Non-standard placement. It is also the most useful part of the document — the only machine-readable
+      statement of the request shape, the tier field lists, the score scales and the 402/429 upgrade
+      semantics — because the provider publishes no OpenAPI (see conformance/).
+  - field: documentationUrl / iconUrl / signatures
+    observed: absent
+    note: >-
+      No documentation link (the /info page and the vendor block's info_page/try_page/upgrade URLs stand
+      in), no icon, and no JWS signature block, so the card's authenticity rests on TLS to agentopt.app.
+  - field: response headers
+    observed: 'x-robots-tag: noindex, nofollow on the card response'
+    note: The operator asks crawlers not to index the card while publishing it for agents; the HTML pages are index,follow.
+surface_relationship:
+  note: >-
+    Priorflow publishes exactly one machine surface — POST https://agentopt.app/v1/select — and one
+    discovery document describing it, the agent card. There is no OpenAPI (/openapi.json, /openapi.yaml,
+    /swagger.json, /docs, /redoc, /api-docs all 404 on a uvicorn/FastAPI host whose auto-docs are disabled),
+    no MCP server (card mcp_server.enabled false; /ready mcp_enabled false; /mcp 404 and disallowed in
+    robots.txt) and no A2A runtime. The human surfaces are /info (identical to /), /try (a browser form
+    for the same POST), /upgrade (Stripe Checkout for paid keys), /status (a daily Observer scorecard) and
+    /explore (a JS-rendered catalog map). Support pages (/health, /ready) are JSON. The free tier is an
+    open pilot: "free tier open on this host when enabled" and /ready require_api_key false.

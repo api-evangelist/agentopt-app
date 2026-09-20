@@ -1,0 +1,75 @@
+generated: '2026-09-19'
+method: searched
+source: https://agentopt.app/.well-known/agent-card.json
+docs:
+- https://agentopt.app/info
+- https://agentopt.app/upgrade
+summary:
+  types:
+  - apiKey
+  - http-bearer
+  api_key_in:
+  - header
+  oauth2_flows: []
+  bearer: true
+  credential_classes: 2
+  headline: >-
+    Two tiers, one credential. The free tier needs no credential at all — only a non-empty User-Agent header
+    and, by convention, a stable caller_agent string in the body — and is open on this host while
+    require_api_key is false (confirmed live via GET /ready). The paid tier uses a key sent as X-API-Key,
+    or equivalently as Authorization: Bearer; keys are issued to a human "sponsor" once (Stripe Checkout at
+    POST /v1/billing/checkout, one-time reveal at GET /v1/billing/session/{session_id}/key, or minted by the
+    operator) and agents use them autonomously thereafter. Invalid keys always return 401; paid-only
+    features without a key return 402 upgrade_required. No OAuth, no OIDC, no discovery documents.
+schemes:
+- name: apiKey
+  type: apiKey
+  in: header
+  parameter: X-API-Key
+  description: 'Paid-tier API key. Free tier works without a key (limited fields). Invalid keys are rejected. (verbatim from the agent card securitySchemes.apiKey.description)'
+  key_prefix: pf_live_
+  key_prefix_evidence: 'The /upgrade page example reads X-API-Key: pf_live_… and the /try page labels its operator-published evaluation key with the same prefix.'
+  issuance:
+    mode: checkout
+    summary: 'POST /v1/billing/checkout then reveal key once via GET /v1/billing/session/{session_id}/key; agents use X-API-Key thereafter. (verbatim, agent card priorflow.upgrade.obtain.summary)'
+    checkout_operation: POST https://agentopt.app/v1/billing/checkout
+    checkout_body_example: '{"customer_email":"sponsor@example.com","client_reference_id":"tenant-1"}'
+    reveal_operation: 'GET https://agentopt.app/v1/billing/session/{session_id}/key (one-time)'
+    human_return_url: 'https://agentopt.app/upgrade/success?session_id=…'
+    operator_issued: 'Operators can still mint keys with create_api_key.py. (verbatim, /upgrade)'
+    docs: https://agentopt.app/upgrade
+  used_by: ['POST /v1/select (paid tier: unlocks tags, dimensions, score_breakdown, recommendation, clarifications, source_url, endpoint/connect, homepage_url, endpoint_status; top_n up to 20; include_explanations)']
+  sources:
+  - a2a/agentopt-app-agent-card.json
+  - https://agentopt.app/upgrade
+- name: bearer
+  type: http
+  scheme: bearer
+  description: 'Also accepted: Authorization: Bearer …. Invalid keys always return 401. (verbatim, /upgrade "How agents use paid access")'
+  note: The same pf_live_ key carried as a bearer token instead of X-API-Key. Declared only in the card's legacy authentication block (schemes [Bearer, ApiKey]) and on the /upgrade page, not in securitySchemes.
+  sources:
+  - a2a/agentopt-app-agent-card.json
+  - https://agentopt.app/upgrade
+anonymous_access:
+  allowed: true
+  evidence: 'agent card security: [] and priorflow.api.select.require_api_key false; /ready require_api_key false (fetched 2026-09-19)'
+  conditions:
+  - 'Requires non-empty User-Agent on free calls. (card, select-agents skill)'
+  - 'Always send a non-empty User-Agent and a stable caller_agent. (/info, Integrate)'
+  - 'Free tier returns id, score, score_band, name only; top_n <= 5; lower RPM (roughly 20/min, 120/hour, 500/day per IP).'
+  - 'The operator can close the free tier: "free tier open on this host when enabled".'
+failure_semantics:
+  invalid_key: 401 (always)
+  paid_feature_without_key: 402 upgrade_required (when enabled)
+  exhausted_pack: 402 select_quota_exceeded or api_key_expired
+  detail: errors/agentopt-app-problem-types.yml
+not_present:
+  oauth2: false
+  oidc: false
+  mutual_tls: false
+  discovery_documents: '/.well-known/oauth-authorization-server and /.well-known/openid-configuration both 404 (well-known/agentopt-app-well-known.yml)'
+note: >-
+  No OpenAPI exists to derive from, so derive-authentication.py had nothing to read; this profile is
+  searched from the agent card's securitySchemes and the /info and /upgrade pages. The evaluation key the
+  operator publishes on /try is deliberately NOT recorded here or anywhere in this repo — it is a live paid
+  credential drawn from a shared, expiring quota pool, not a test-mode value (see sandbox/).

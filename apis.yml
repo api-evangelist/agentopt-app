@@ -1,18 +1,94 @@
 aid: agentopt-app
-name: Vitaly Kantorovich (vitaly.kantorovich.tx@gmail.com)
-description: 'Vitaly Kantorovich (vitaly.kantorovich.tx@gmail.com) is a company surfaced via the API Evangelist
-  harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.'
+name: Priorflow
+description: >-
+  Priorflow Intelligent Agent/Service Selector is a hosted, agent-native selection service at agentopt.app,
+  operated by Vitaly Kantorovich, that ranks curated MCP servers and A2A agents for a natural-language task
+  under stated constraints (reliability, cost, latency, autonomy, maturity) using hybrid structured + semantic
+  matching over a catalog of about 5,000 active / 7,900 total candidates — "registries help agents find
+  candidates; Priorflow helps agents choose among them". The whole product is one JSON operation, POST
+  https://agentopt.app/v1/select, with an open free tier (no key, four fields, top_n <= 5, roughly 20/min ·
+  120/hour · 500/day per IP) and a paid X-API-Key tier sold as Stripe Checkout "select packs" that unlocks
+  rich fields and top_n <= 20. It is described by an A2A agent card at /.well-known/agent-card.json
+  (protocolVersion "1.0", two skills, conformant) whose vendor block is also the only machine-readable
+  contract; the operator states plainly that the host is not an MCP server and runs no A2A task runtime,
+  and publishes no OpenAPI, SDK, terms of service or privacy policy.
 url: https://raw.githubusercontent.com/api-evangelist/agentopt-app/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- AI Agents
+- Agent Discovery
+- Agent Selection
+- A2A
+- MCP
+- Agent Orchestration
+- Tool Ranking
+- Semantic Search
+- agent-native
+tags_raw:
+- AI agents
+- Agent discovery
+- Agent selection
+- A2A
+- MCP
+- Agent orchestration
+- Tool ranking
+- Semantic search
+- Agent-native
+apis:
+- aid: agentopt-app:priorflow-select-api
+  name: Priorflow Intelligent Agent/Service Selector API
+  description: >-
+    One operation: POST /v1/select with JSON {query, top_n?, constraints?, weights?, caller_agent?} returns
+    ordered MCP/A2A candidates with an absolute 0-1 hybrid-fit score (0.55 usable, 0.72+ strong). Free tier
+    needs no key (non-empty User-Agent required) and returns id, score, score_band, name with top_n <= 5;
+    a paid pf_live_ key sent as X-API-Key or Authorization Bearer unlocks source_url, endpoint/connect,
+    homepage_url, endpoint_status, tags, dimensions, recommendation, clarifications and score_breakdown with
+    top_n <= 20. Invalid keys 401; paid features without a key 402 upgrade_required; free-tier exhaustion 429
+    with a machine-readable upgrade object. Described only by the A2A agent card's priorflow.api block — no
+    OpenAPI is published; robots.txt disallows /v1/ to crawlers.
+  humanURL: https://agentopt.app/info
+  baseURL: https://agentopt.app/v1
+  tags:
+  - AI Agents
+  - Agent Discovery
+  - Agent Selection
+  - A2A
+  - MCP
+  properties:
+  - type: Documentation
+    url: https://agentopt.app/info
+  - type: GettingStarted
+    url: https://agentopt.app/info#integrate
+  - type: Playground
+    url: https://agentopt.app/try
+  - type: AgentCard
+    url: a2a/agentopt-app-a2a.yml
+  - type: AgentCard
+    name: A2A Agent Card (provider-hosted)
+    url: https://agentopt.app/.well-known/agent-card.json
+  - type: Authentication
+    url: authentication/agentopt-app-authentication.yml
+  - type: Conventions
+    url: conventions/agentopt-app-conventions.yml
+  - type: ErrorCatalog
+    url: errors/agentopt-app-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/agentopt-app-rate-limits.yml
+  - type: Plans
+    url: plans/agentopt-app-plans-pricing.yml
+  - type: Sandbox
+    url: sandbox/agentopt-app-sandbox.yml
+  - type: Conformance
+    url: conformance/agentopt-app-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/agentopt-app-lifecycle.yml
+  overlays: []
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -21,3 +97,61 @@ maintainers:
 common:
 - type: Website
   url: https://agentopt.app/
+- type: Documentation
+  url: https://agentopt.app/info
+- type: GettingStarted
+  url: https://agentopt.app/info#integrate
+- type: Playground
+  url: https://agentopt.app/try
+- type: Pricing
+  url: https://agentopt.app/upgrade
+- type: SignUp
+  url: https://agentopt.app/upgrade
+- type: StatusPage
+  url: https://agentopt.app/status
+- type: AgentCard
+  url: a2a/agentopt-app-a2a.yml
+- type: WellKnown
+  url: well-known/agentopt-app-well-known.yml
+- type: LLMsTxt
+  url: llms/agentopt-app-llms.txt
+- type: Authentication
+  url: authentication/agentopt-app-authentication.yml
+- type: Conventions
+  url: conventions/agentopt-app-conventions.yml
+- type: ErrorCatalog
+  url: errors/agentopt-app-problem-types.yml
+- type: RateLimits
+  url: rate-limits/agentopt-app-rate-limits.yml
+- type: Plans
+  url: plans/agentopt-app-plans-pricing.yml
+- type: Sandbox
+  url: sandbox/agentopt-app-sandbox.yml
+- type: Conformance
+  url: conformance/agentopt-app-conformance.yml
+- type: Lifecycle
+  url: lifecycle/agentopt-app-lifecycle.yml
+- type: DomainSecurity
+  url: security/agentopt-app-domain-security.yml
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 15
+  pass: local-v3
+x-coverage:
+  state: covered
+  reason: null
+  detail: >-
+    Full public surface reached with no wall: the A2A agent card was fetched from the provider's own host
+    (200, 8,377 bytes, conformant) and every human page (/info, /try, /upgrade, /status) is server-rendered
+    HTML. The provider publishes no OpenAPI — /openapi.json, /docs and /redoc all return the app's JSON 404 —
+    and robots.txt disallows /v1/, /mcp and /a2a, which this pass honored, so POST /v1/select was described
+    from the card and pages rather than exercised.
+  evidence:
+  - url: https://agentopt.app/.well-known/agent-card.json
+    status: 200
+  - url: https://agentopt.app/openapi.json
+    status: 404
+  - url: https://agentopt.app/robots.txt
+    status: 200
+  checked: '2026-09-19'
