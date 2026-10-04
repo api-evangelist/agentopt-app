@@ -29,7 +29,7 @@ tags:
 - Agent Orchestration
 - Tool Ranking
 - Semantic Search
-- agent-native
+- Agent-Native
 tags_raw:
 - AI agents
 - Agent discovery
@@ -40,6 +40,7 @@ tags_raw:
 - Tool ranking
 - Semantic search
 - Agent-native
+- agent-native
 apis:
 - aid: agentopt-app:priorflow-select-api
   name: Priorflow Intelligent Agent/Service Selector API
@@ -155,3 +156,10 @@ x-coverage:
   - url: https://agentopt.app/robots.txt
     status: 200
   checked: '2026-09-19'
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://agentopt.app/.well-known/agent-card.json"
+  grade: "near-conformant"
+  protocol_version: "1.0"
+  control: 404
