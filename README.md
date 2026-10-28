@@ -64,6 +64,101 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Priorflow (Priorflow Intelligent Agent/Service Selector) is a hosted, agent-native selection service at agentopt.app, operated by Vitaly Kantorovich, that ranks curated MCP servers and A2A agents for a natural-language task under stated constraints via a single operation, POST https://agentopt.app/v1/select. It is described by an A2A agent card at /.well-known/agent-card.json; the operator states the host is not an MCP server and runs no A2A task runtime, and publishes no OpenAPI. Surfaced via the API Evangelist harvest backlog (source: a2a-registry) and profiled 2026-09-19.
-- https://agentopt.app/
-- https://agentopt.app/.well-known/agent-card.json
+Priorflow Intelligent Agent/Service Selector is a hosted, agent-native selection service at agentopt.app, operated by Vitaly Kantorovich, that ranks curated MCP servers and A2A agents for a natural-language task under stated constraints (reliability, cost, latency, autonomy, maturity) using hybrid structured + semantic matching over a catalog of about 5,000 active / 7,900 total candidates — "registries help agents find candidates; Priorflow helps agents choose among them". The whole product is one JSON operation, POST https://agentopt.app/v1/select, with an open free tier (no key, four fields, top_n <= 5, roughly 20/min · 120/hour · 500/day per IP) and a paid X-API-Key tier sold as Stripe Checkout "select packs" that unlocks rich fields and top_n <= 20. It is described by an A2A agent card at /.well-known/agent-card.json (protocolVersion "1.0", two skills, conformant) whose vendor block is also the only machine-readable contract; the operator states plainly that the host is not an MCP server and runs no A2A task runtime, and publishes no OpenAPI, SDK, terms of service or privacy policy.
+
+**Areas:** AI Agents · Agent Discovery · Agent Selection · A2A · MCP · Agent Orchestration · Tool Ranking · Semantic Search · Agent-Native
+
+## Priorflow on APIs.io
+
+Everything profiled for Priorflow is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/agentopt-app/](https://apis.io/providers/agentopt-app/)** — or go straight to one of the APIs or properties below.
+
+### APIs (1)
+
+- [Priorflow Intelligent Agent/Service Selector API](https://apis.io/apis/agentopt-app/priorflow-select-api/) — One operation: POST /v1/select with JSON {query, top_n?, constraints?, weights?, caller_agent?} returns ordered MCP/A2A candidates with an absolute 0-1…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Agentopt App Authentication](https://apis.io/security/agentopt-app/agentopt-app-authentication/)
+- [Agentopt App Domain Security](https://apis.io/security/agentopt-app/agentopt-app-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Agentopt App Plans Pricing](https://apis.io/plans/agentopt-app/agentopt-app-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Agentopt App Rate Limits](https://apis.io/rate-limits/agentopt-app/agentopt-app-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://agentopt.app/)
+- [Documentation](https://agentopt.app/info)
+- [Getting started](https://agentopt.app/info#integrate)
+- [Pricing](https://agentopt.app/upgrade)
+- [Sign up](https://agentopt.app/upgrade)
+- [Status](https://agentopt.app/status)
+
+## API Evangelist rating
+
+**Kin Score 31.9** — thin · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 62.5 |
+| Contract quality | 0.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 47.4 |
+| Developer ergonomics | 40.5 |
+| Access clarity | 44.7 |
+
+**Agent readiness 13.7** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | conformant |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 16.7** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/agentopt-app/](https://apis.io/providers/agentopt-app/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Priorflow: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/agentopt-app/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
